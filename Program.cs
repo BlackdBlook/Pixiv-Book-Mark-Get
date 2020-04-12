@@ -11,16 +11,30 @@ namespace CSharp_PixivGetter_Console
         static void Main(string[] args)
         {
             //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
-            CreateRun();
+            if(!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "Cookies.txt"))
+            {
+                CreateCookieFile();
+                Console.ReadKey();
+                return;
+            }
+            else
+            {
+                string s = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "Cookies.txt");
+                if (s.Length > 0)
+                    CreateRun(s);
+                else
+                    CreateCookieFile();
+            }            
+            Console.ReadKey();
         }
-        private static void CreateRun()
+        private static void CreateCookieFile()
         {
-            string cook;
-            Console.WriteLine("输入账号Cookie：\n");
-            cook=Console.ReadLine();
-            Run r;
-            r = new Run(cook);
-
+            File.Create(AppDomain.CurrentDomain.BaseDirectory + "Cookies.txt"); 
+            Console.WriteLine("在  "+ AppDomain.CurrentDomain.BaseDirectory + "Cookies.txt  中输入账号的Cookies");
+        }
+        private static void CreateRun(string cook)
+        {
+            _ = new Run(cook);
         }
     }
 }

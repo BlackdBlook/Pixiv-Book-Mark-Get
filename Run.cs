@@ -10,16 +10,20 @@ namespace CSharp_PixivGetter_Console
     {
         private int PageCount;
         private int IDCount;
-        private object samp = new object();
+        private object samp = new object();//互斥锁，竞争PageCount
         private List<string>[] Indexs;
         private Thread[] ts;
         private List<string> indexList = new List<string>();
         private string cookie;
-        public Run(string cookie,int threadCount=constr.ThreadCount)
+        public Run(string cookie, int threadCount = constr.ThreadCount)
         {
             this.cookie = cookie;
             Start();
         }
+        /// <summary>
+        /// 开始
+        /// </summary>
+        /// <param name="threadCount">处理线程数</param>
         private void Start(int threadCount = constr.ThreadCount)
         {
             ts = new Thread[threadCount];
@@ -47,11 +51,10 @@ namespace CSharp_PixivGetter_Console
             RunningPath += "IDCount-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
             Console.WriteLine("统计结构存储到 :" + RunningPath);
             FileStream f = File.Create(RunningPath);
-            StreamWriter w = new StreamWriter(f,Encoding.UTF8);
+            StreamWriter w = new StreamWriter(f, Encoding.UTF8);
             int Count = 1;
             foreach (var s in indexList)
             {
-                //Console.WriteLine(Count.ToString() + "---" + s + "\n");
                 w.Write(Count++.ToString() + "---" + s + "\n");
                 w.Flush();
             }
@@ -59,41 +62,50 @@ namespace CSharp_PixivGetter_Console
             f.Close();
 
 
-            Console.WriteLine("统计结果共计     "+indexList.Count);
-            Console.ReadKey();
+            Console.WriteLine("统计结果共计     " + indexList.Count);
         }
 
-
-
+        private static void writeStringToFile(string str,int index)
+        {
+            File.WriteAllText("Z:\\Test" + index.ToString() + ".html", str);
+        }
+        /// <summary>
+        /// 获取收藏总数
+        /// </summary>
+        /// <returns>收藏总数</returns>
         private int Init()
         {
             string str = HttpRequst.GetHtmls(constr.GetAddress(1), "",cookie);
-            int i = str.IndexOf("count-badge");
-            str = str.Substring(i + 13, 10);
-            int LevelCount = 0;
+            writeStringToFile(str, 1);
+            int i = str.IndexOf("count-badge"); 
+            str = str.Substring(i + 13, 100);
+            int Count = 0;
             foreach (var c in str)
             {
                 if (c <= 57 && c >= 48)
-                    LevelCount++;
+                    Count++;
                 else
                     break;
             }
             try
             {
-                return int.Parse(str.Substring(0, LevelCount));
+                return int.Parse(str.Substring(0, Count));
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("错误："+ex.Message+"，检查Cookie是否正确");
                 return 0;
             }
         }
-
+        /// <summary>
+        /// 多线程数据处理
+        /// </summary>
         private void Pross()
         {
             int i;
             while (true)
             {
+                
                 lock (samp)
                 {
                     if (PageCount == 0)
@@ -102,7 +114,6 @@ namespace CSharp_PixivGetter_Console
                     PageCount--;
                 }
                 string str = HttpRequst.GetHtmls(constr.GetAddress(i), "", cookie);
-                //string str = File.ReadAllText("Z:\\Test" + i.ToString() + ".html");//Debug
                 //File.WriteAllText("Z:\\Test" + i.ToString() + ".html", str);//保存下载到的网页数据
                 Indexs[i - 1] = HttpRequst.SearchInHtmlFile(str, i);
             }
