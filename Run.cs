@@ -20,13 +20,6 @@ namespace CSharp_PixivGetter_Console
             this.cookie = cookie;
             Start();
         }
-
-        public Run(int threadCount = constr.ThreadCount)
-        { 
-            cookie = constr.cookie;
-            Start();
-        }
-
         private void Start(int threadCount = constr.ThreadCount)
         {
             ts = new Thread[threadCount];
@@ -72,9 +65,9 @@ namespace CSharp_PixivGetter_Console
 
 
 
-        private static int Init()
+        private int Init()
         {
-            string str = HttpRequst.GetHtmls(constr.GetAddress(1), "", constr.cookie);
+            string str = HttpRequst.GetHtmls(constr.GetAddress(1), "",cookie);
             int i = str.IndexOf("count-badge");
             str = str.Substring(i + 13, 10);
             int LevelCount = 0;

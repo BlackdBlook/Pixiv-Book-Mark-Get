@@ -19,10 +19,8 @@ namespace CSharp_PixivGetter_Console
             Console.WriteLine("输入账号Cookie：\n");
             cook=Console.ReadLine();
             Run r;
-            if (cook != "0")
-                r = new Run(cook);
-            else
-                r = new Run();
+            r = new Run(cook);
+
         }
     }
 }
