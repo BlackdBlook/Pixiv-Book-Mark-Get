@@ -49,7 +49,7 @@ namespace CSharp_PixivGetter_Console
             }
             string RunningPath = AppDomain.CurrentDomain.BaseDirectory;
             RunningPath += "IDCount-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
-            Console.WriteLine("统计结构存储到 :" + RunningPath);
+            Console.WriteLine("统计结果存储到 :" + RunningPath);
             FileStream f = File.Create(RunningPath);
             StreamWriter w = new StreamWriter(f, Encoding.UTF8);
             int Count = 1;
