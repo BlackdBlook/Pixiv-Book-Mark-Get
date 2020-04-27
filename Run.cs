@@ -67,7 +67,7 @@ namespace CSharp_PixivGetter_Console
 
         private static void writeStringToFile(string str,int index)
         {
-            File.WriteAllText("Z:\\Test" + index.ToString() + ".html", str);
+            File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + index.ToString() + ".html", str);
         }
         /// <summary>
         /// 获取收藏总数
